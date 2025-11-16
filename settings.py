@@ -13,7 +13,6 @@ class Settings:
         self.bg_file = Path.cwd() / 'Assets' / 'images' / 'starbasesnow.png'
         self.bg_color = (230, 230, 230)
         
-        self.ship_file = Path.cwd() / 'Assets' / 'images' / 'ship2python alien_invasion.py
-.png'
+        self.ship_file = Path.cwd() / 'Assets' / 'images' / 'ship2.png'
         self.ship_width = 40
         self.ship_height = 60
