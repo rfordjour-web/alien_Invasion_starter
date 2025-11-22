@@ -29,6 +29,8 @@ class AlienFleet:
 
         for column in range(fleet_width):
             current_x = alien_width * column  + x_offset
+            if column % 2 == 0:
+                continue # Skip every other alien to create spacing
             self._create_alien(current_x, 10)
 
 
