@@ -76,22 +76,21 @@ class AlienFleet:
 
         self.fleet.add(new_alien)
 
-        def _check_fleet_edges(self):
+    def _check_fleet_edges(self):
             """Respond appropriately if any aliens have reached an edge."""
             alien: 'Alien'
             for alien in self.fleet:
                 if alien.check_edges():
-                    if alien.check_edges():
                         self._drop_alien_fleet()
                         self.fleet_direction *= -1
                         break
                         
-        def update_fleet(self):
+    def update_fleet(self):
             self._check_fleet_edges()
             self.fleet.update()
 
-def _drop_alien_fleet(self):
-    for alien in self.fleet:
+    def _drop_alien_fleet(self):
+       for alien in self.fleet:
         alien.y += self.fleet_drop_speed
 
 def draw(self):
