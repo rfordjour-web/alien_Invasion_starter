@@ -22,30 +22,71 @@ class AlienInvasion:
         )
         pygame.display.set_caption(self.settings.name)
 
-        self.bg = pygame.image.load(str(self.settings.bg_file))
-        self.bg = pygame.transform.scale(
-            self.bg,
-            (self.settings.screen_width, self.settings.screen_height)
-        )
+        # Remove loading background image — we now draw Ghana flag manually
+        # self.bg = pygame.image.load(str(self.settings.bg_file))
+        # self.bg = pygame.transform.scale(
+        #     self.bg,
+        #     (self.settings.screen_width, self.settings.screen_height)
+        # )
 
         self.running = True
         self.clock = pygame.time.Clock()
 
-        pygame.mixer.init()         
+        pygame.mixer.init()
         self.laser_sound = pygame.mixer.Sound(str(self.settings.laser_sound))
         self.laser_sound.set_volume(0.7)
 
         self.impact_sound = pygame.mixer.Sound(str(self.settings.impact_sound))
         self.impact_sound.set_volume(0.7)
 
-        self.bullets = pygame.sprite.Group()  # Added bullets group
+        self.bullets = pygame.sprite.Group()
         self.ship = Ship(self, ShipArsenal(self))
         self.alien_fleet = AlienFleet(self)
         self.alien_fleet.create_fleet()
-        self.game_active = True 
+        self.game_active = True
+
+    # ---------------------------------------------------------
+    # 🇬🇭 GHANA FLAG BACKGROUND DRAWING FUNCTION
+    # ---------------------------------------------------------
+    def draw_ghana_background(self):
+        screen_w = self.settings.screen_width
+        screen_h = self.settings.screen_height
+        stripe_h = screen_h // 3
+
+        RED = (206, 17, 38)
+        GOLD = (252, 209, 22)
+        GREEN = (0, 122, 61)
+        BLACK = (0, 0, 0)
+
+        # Draw stripes
+        pygame.draw.rect(self.screen, RED, (0, 0, screen_w, stripe_h))
+        pygame.draw.rect(self.screen, GOLD, (0, stripe_h, screen_w, stripe_h))
+        pygame.draw.rect(self.screen, GREEN, (0, stripe_h * 2, screen_w, stripe_h))
+
+        # Draw black star centered
+        star_size = stripe_h // 2
+        center_x = screen_w // 2
+        center_y = stripe_h + (stripe_h // 2)
+
+        # 5-point star polygon
+        star_points = [
+            (center_x, center_y - star_size // 2),
+            (center_x + star_size // 3, center_y - star_size // 8),
+            (center_x + star_size // 2, center_y - star_size // 8),
+            (center_x + star_size // 4, center_y + star_size // 6),
+            (center_x + star_size // 3, center_y + star_size // 2),
+            (center_x, center_y + star_size // 3),
+            (center_x - star_size // 3, center_y + star_size // 2),
+            (center_x - star_size // 4, center_y + star_size // 6),
+            (center_x - star_size // 2, center_y - star_size // 8),
+            (center_x - star_size // 3, center_y - star_size // 8),
+        ]
+
+        pygame.draw.polygon(self.screen, BLACK, star_points)
+
+    # ---------------------------------------------------------
 
     def run_game(self):
-        # Main loop for the game.
         while self.running:
             self._check_events()
             if self.game_active:
@@ -62,7 +103,7 @@ class AlienInvasion:
         if self.alien_fleet.check_fleet_bottom():
             self._check_game_status()
 
-        collisions = self.alien_fleet.check_collisions(self.ship.arsenal.arsenal)  
+        collisions = self.alien_fleet.check_collisions(self.ship.arsenal.arsenal)
         if collisions:
             self.impact_sound.play()
             self.impact_sound.fadeout(500)
@@ -78,20 +119,24 @@ class AlienInvasion:
         else:
             self.game_active = False
 
-    def _reset_level(self): 
+    def _reset_level(self):
         self.ship.arsenal.arsenal.empty()
         self.alien_fleet.fleet.empty()
         self.alien_fleet.create_fleet()
 
+    # ---------------------------------------------------------
+    # UPDATED SCREEN DRAW — GHANA FLAG FIRST
+    # ---------------------------------------------------------
     def _update_screen(self):
-        self.screen.blit(self.bg, (0, 0))
+        self.draw_ghana_background()   # ← 🇬🇭 NEW BACKGROUND
 
         for bullet in self.bullets:
             bullet.draw()
 
         self.ship.draw()
         self.alien_fleet.draw()
-        pygame.display.flip()        
+        pygame.display.flip()
+    # ---------------------------------------------------------
 
     def _check_events(self):
         for event in pygame.event.get():
@@ -116,7 +161,7 @@ class AlienInvasion:
         elif event.key == pygame.K_DOWN:
             self.ship.moving_down = True
         elif event.key == pygame.K_SPACE:
-            self.ship.fire_bullet()  
+            self.ship.fire_bullet()
         elif event.key == pygame.K_q:
             pygame.quit()
             sys.exit()
