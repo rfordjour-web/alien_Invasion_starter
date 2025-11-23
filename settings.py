@@ -4,6 +4,9 @@ class Settings:
 
     def __init__(self):
         """Initialize the game's settings."""
+        #Game window title 
+        self.name = "Alien Invasion"
+
         # Screen settings
         self.screen_width = 1200
         self.screen_height = 800
@@ -17,7 +20,7 @@ class Settings:
 
 
         self.bullet_file = Path.cwd() / 'Assets' / 'images' / ' laserBlast.png'
-        self.laser_sound = Path.cwd() / 'Assets' / 'sounds' / 'laser.mp3'
+        self.laser_sound = Path.cwd() / 'Assets' / 'sound' / 'laser.mp3'
         self.bullet_speed = 7
         self.bullet_width = 5
         self.bullet_height = 80
@@ -27,4 +30,6 @@ class Settings:
         self.alien_width = 40
         self.alien_height = 40
         
-        self.fleet_speed = 2
+        self.fleet_speed = 5
+        self.fleet_direction = 1  # 1 represents right; -1 represents left
+        self.fleet_drop_speed = 40

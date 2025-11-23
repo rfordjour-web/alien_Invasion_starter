@@ -19,37 +19,80 @@ class AlienFleet:
 
     def create_fleet(self):
         alien_width = self.settings.alien_width
+        alien_height = self.settings.alien_height
         screen_width = self.settings.screen_width
+        screen_height  = self.settings.screen_height
 
 
-        fleet_width = self.calculate_fleet_size(alien_width, screen_width)
-        #half_screen = self.settings.screen_width
-        fleet_horizontal_space = fleet_width * alien_width
-        x_offset = int((screen_width - fleet_horizontal_space) // 2)
 
-        for column in range(fleet_width):
-            current_x = alien_width * column  + x_offset
+        fleet_width, fleet_height = self.calculate_fleet_size(alien_width, screen_width, alien_height, screen_height)
+        x_offset, y_offset = self.calculate_offset(alien_width, alien_height, screen_width, fleet_width, fleet_height)
+
+
+        self._create_rectangle_fleet(alien_width, alien_height, fleet_width, fleet_height, x_offset, y_offset)
+
+    def _create_rectangle_fleet(self, alien_width, alien_height, fleet_width, fleet_height, x_offset, y_offset):
+        for row in range(fleet_height):
+            for column in range(fleet_width):
+                current_x = alien_width * column  + x_offset
+                current_y = alien_height * row + y_offset
             if column % 2 == 0:
                 continue # Skip every other alien to create spacing
-            self._create_alien(current_x, 10)
+            self._create_alien(current_x, current_y)
+
+    def calculate_offset(self, alien_width, alien_height, screen_width, fleet_width, fleet_height):
+        half_screen = self.settings.screen_height // 2
+        fleet_horizontal_space = fleet_width * alien_width
+        fleet_vertical_space = fleet_height * alien_height
+        x_offset = int((screen_width - fleet_horizontal_space) // 2)
+        y_offset = int((half_screen - fleet_vertical_space) // 2)
+        return x_offset,y_offset
 
 
 
-    def calculate_fleet_size(self, alien_width, screen_width):
+    def calculate_fleet_size(self, alien_width, screen_width, alien_height, screen_height):
         fleet_width = (screen_width//alien_width)
+        fleet_height = ((screen_height/2)//alien_width)
 
         if fleet_width % 2 == 0:
             fleet_width -= 1
         else:
             fleet_width -= 2
 
-        return fleet_width
+
+
+        if fleet_height % 2 == 0:
+            fleet_height -= 1
+        else:
+            fleet_height -= 2
+
+
+
+        return int(fleet_width),  int(fleet_height)
 
     def _create_alien(self, current_x, int, current_y: int):
         new_alien = Alien(self.game, current_x, current_y)
 
 
         self.fleet.add(new_alien)
+
+        def _check_fleet_edges(self):
+            """Respond appropriately if any aliens have reached an edge."""
+            alien: 'Alien'
+            for alien in self.fleet:
+                if alien.check_edges():
+                    if alien.check_edges():
+                        self._drop_alien_fleet()
+                        self.fleet_direction *= -1
+                        break
+                        
+        def update_fleet(self):
+            self._check_fleet_edges()
+            self.fleet.update()
+
+def _drop_alien_fleet(self):
+    for alien in self.fleet:
+        alien.y += self.fleet_drop_speed
 
 def draw(self):
         alien: 'Alien'
