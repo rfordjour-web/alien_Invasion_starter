@@ -1,3 +1,9 @@
+
+
+
+
+
+
 import sys
 import pygame
 from settings import Settings
@@ -22,22 +28,19 @@ class AlienInvasion:
         )
         pygame.display.set_caption(self.settings.name)
 
-        # Remove loading background image — we now draw Ghana flag manually
-        # self.bg = pygame.image.load(str(self.settings.bg_file))
-        # self.bg = pygame.transform.scale(
-        #     self.bg,
-        #     (self.settings.screen_width, self.settings.screen_height)
-        # )
-
         self.running = True
         self.clock = pygame.time.Clock()
 
+        # Initialize mixer and sounds
         pygame.mixer.init()
         self.laser_sound = pygame.mixer.Sound(str(self.settings.laser_sound))
         self.laser_sound.set_volume(0.7)
 
         self.impact_sound = pygame.mixer.Sound(str(self.settings.impact_sound))
         self.impact_sound.set_volume(0.7)
+
+        # ✅ Load alien drum sound
+        self.alien_drums = 'Assets/alien_drums.wav'
 
         self.bullets = pygame.sprite.Group()
         self.ship = Ship(self, ShipArsenal(self))
@@ -85,6 +88,13 @@ class AlienInvasion:
         pygame.draw.polygon(self.screen, BLACK, star_points)
 
     # ---------------------------------------------------------
+    # ✅ NEW: Play alien drum intro
+    # ---------------------------------------------------------
+    def play_alien_drums(self):
+        pygame.mixer.music.load(self.alien_drums)
+        pygame.mixer.music.play(-1)  # loop while aliens are on screen
+
+    # ---------------------------------------------------------
 
     def run_game(self):
         while self.running:
@@ -119,10 +129,14 @@ class AlienInvasion:
         else:
             self.game_active = False
 
+    # ---------------------------------------------------------
+    # ✅ Updated: Reset level and start alien drum
+    # ---------------------------------------------------------
     def _reset_level(self):
         self.ship.arsenal.arsenal.empty()
         self.alien_fleet.fleet.empty()
         self.alien_fleet.create_fleet()
+        self.play_alien_drums()  # ← play drum intro for new aliens
 
     # ---------------------------------------------------------
     # UPDATED SCREEN DRAW — GHANA FLAG FIRST

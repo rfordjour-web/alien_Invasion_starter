@@ -3,15 +3,18 @@ from pygame.sprite import Sprite
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from alien_invasion import AlienInvasion
+    from alien_fleet import AlienFleet
 
 class Alien(Sprite):
-    def __init__(self, game: 'AlienInvasion', x: float, y: float):
+    def __init__(self, fleet: 'AlienFleet', x: float, y: float):
         super().__init__()
 
-        self.screen = game.screen
-        self.boundaries = game.screen.get_rect()
-        self.settings = game.settings
+        self.fleet = fleet
+
+
+        self.screen = fleet.game.screen
+        self.boundaries = fleet.game.screen.get_rect()
+        self.settings = fleet.game.settings
 
         self.image = pygame.image.load(self.settings.alien_file)
         self.image = pygame.transform.scale(self.image,
@@ -30,8 +33,16 @@ class Alien(Sprite):
 
         def update(self):
             temp_speed = self.settings.fleet_speed
-            self.x += temp_speed
+            
+            self.x += temp_speed * self.settings.fleet_direction
             self.rect.x = self.x
+            self.rect.y = self.y
+
+        def check_edges(self):
+            """Return True if alien is at edge of screen."""
+            return(self.rect.right >= self.boundaries.right or self.rect.left <= self.boundaries.left)
+        
+
 
         def draw_alien(self):
             self.screen.blit(self.image, self.rect) 
