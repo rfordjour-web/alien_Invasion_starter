@@ -39,11 +39,11 @@ class AlienInvasion:
         # Alien fleet
         self.alien_fleet = AlienFleet(self)
 
-        # Play alien drum intro
-        self.play_alien_drums()
-
         # Font for life counter
         self.font = pygame.font.SysFont(None, 40)
+
+        # Play alien drum intro
+        self.play_alien_drums()
 
     # ------------------------
     # Ghana flag background
