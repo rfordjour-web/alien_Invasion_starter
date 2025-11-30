@@ -33,14 +33,14 @@ class Settings:
         # ------------------------
         # Bullet settings
         # ------------------------
-        self.bullet_file = Path.cwd() / 'Assets' / 'images' / 'laserBlast.png'
+        self.bullet_width = 7
+        self.bullet_height = 25
+        self.bullet_speed = 10
+        self.bullets_allowed = 10
         self.bullet_color = (255, 255, 255)
         self.laser_sound = Path.cwd() / 'Assets' / 'sound' / 'laser.mp3'
         self.impact_sound = Path.cwd() / 'Assets' / 'sound' / 'impactSound.mp3'
-        self.bullet_speed = 7
-        self.bullet_width = 5
-        self.bullet_height = 20
-        self.bullets_allowed = 5
+
 
         # ------------------------
         # Alien settings
@@ -50,7 +50,7 @@ class Settings:
         self.alien_height = 40
         self.fleet_speed = 0.35
         self.fleet_direction = 1  # 1 represents right; -1 represents left
-        self.fleet_drop_speed = 2
+        self.fleet_drop_speed = 1
 
         # ------------------------
         # Alien drum intro
