@@ -23,7 +23,8 @@ def draw_star(surface, color, center, radius):
         r = radius if i % 2 == 0 else radius * 0.4
         x = center[0] + r * math.cos(angle)
         y = center[1] - r * math.sin(angle)
-        points.append((x, y))
+        points.append((x
+                     , y))
     pygame.draw.polygon(surface, color, points)
 
 # ------------------------
