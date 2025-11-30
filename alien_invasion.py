@@ -11,6 +11,7 @@ from time import sleep
 from settings import Settings
 from game_stats import GameStats
 from ship import Ship
+from arsenal import ShipArsenal
 from alien_fleet import AlienFleet
 
 # ------------------------
@@ -39,14 +40,18 @@ def draw_starburst(surface, color, center, radius, ray_len, count):
         pygame.draw.line(surface, color, (x1, y1), (x2, y2), 2)
 
 class AlienInvasion:
+    """Main class to manage game assets and behavior."""
+
     def __init__(self):
         pygame.init()
         pygame.mixer.init()
+
         self.settings = Settings()
         self.screen = pygame.display.set_mode(
             (self.settings.screen_width, self.settings.screen_height)
         )
         pygame.display.set_caption(self.settings.name)
+
         self.clock = pygame.time.Clock()
         self.running = True
 
@@ -65,18 +70,25 @@ class AlienInvasion:
         # FX timers
         self.star_timer = 0
         self.ripple_timer = 0
+
+        # Drum beat timing
         self.beat_max = 40
         self.beat_timer = self.beat_max
 
-        # Victory celebration
-        self.victory = False
-        self.victory_timer = 0
+        # Difficulty flash effect
+        self.difficulty_flash_timer = 0
+        self.difficulty_flash_duration = 30
+        self.difficulty_flash_active = False
 
-        # Play alien drum intro
+        # Win celebration flag
+        self.win_flash_timer = 0
+        self.win_flash_duration = 60
+        self.win_flash_active = False
+
         self.play_alien_drums()
 
     # ------------------------
-    # Ghana flag + FX
+    # Ghana FX background
     # ------------------------
     def draw_ghana_background(self):
         w = self.settings.screen_width
@@ -88,7 +100,7 @@ class AlienInvasion:
         GREEN = (0, 122, 61)
         BLACK = (0, 0, 0)
 
-        # Ripple effect
+        # Ripple effect synced to beat
         self.ripple_timer += 1
         if self.beat_timer >= self.beat_max:
             self.beat_timer = 0
@@ -107,22 +119,46 @@ class AlienInvasion:
                 6
             )
 
-        # Draw stripes
         pygame.draw.rect(self.screen, RED,   (0, 0, w, stripe_h))
         pygame.draw.rect(self.screen, GOLD,  (0, stripe_h, w, stripe_h))
         pygame.draw.rect(self.screen, GREEN, (0, stripe_h*2, w, stripe_h))
+
         self.screen.blit(ripple_surface, (0, 0))
 
-        # Pulsing star
+        # Pulsing star glow
         self.star_timer += 0.07
         pulse = math.sin(self.star_timer) * 5
-        cx, cy = w // 2, stripe_h + stripe_h // 2
+
+        cx = w // 2
+        cy = stripe_h + (stripe_h // 2)
         base_radius = stripe_h * 0.35
         radius = base_radius + pulse
 
-        draw_starburst(self.screen, (255, 215, 90), (cx, cy), radius, ray_len=46 + abs(pulse * 3), count=12)
-        draw_star(self.screen, (60, 60, 60), (cx, cy), radius + 6)
-        draw_star(self.screen, BLACK, (cx, cy), radius)
+        # Lens flare rays
+        draw_starburst(
+            self.screen,
+            (255, 215, 90),
+            (cx, cy),
+            radius,
+            ray_len=46 + abs(pulse * 3),
+            count=12
+        )
+
+        # Soft glow
+        draw_star(
+            self.screen,
+            (60, 60, 60),
+            (cx, cy),
+            radius + 6
+        )
+
+        # Main star
+        draw_star(
+            self.screen,
+            BLACK,
+            (cx, cy),
+            radius
+        )
 
     # ------------------------
     # Drum intro
@@ -146,21 +182,37 @@ class AlienInvasion:
         self.screen.blit(text_surf, text_rect)
 
     # ------------------------
-    # Victory celebration
+    # Difficulty UI
     # ------------------------
-    def draw_victory(self):
-        self.victory_timer += 1
-        cx, cy = self.settings.screen_width // 2, self.settings.screen_height // 2
-        # Sparkling stars
-        for i in range(15):
-            angle = math.radians((360 / 15) * i + self.victory_timer)
-            x = cx + 150 * math.cos(angle)
-            y = cy + 150 * math.sin(angle)
-            pygame.draw.circle(self.screen, (255, 255, 0), (int(x), int(y)), 6)
-        # YOU WIN text
-        win_text = self.font.render("YOU WIN!", True, (255, 255, 255))
-        rect = win_text.get_rect(center=(cx, cy))
-        self.screen.blit(win_text, rect)
+    def draw_difficulty(self):
+        if self.difficulty_flash_active:
+            color = (255, 255, 0)
+            self.difficulty_flash_timer += 1
+            if self.difficulty_flash_timer >= self.difficulty_flash_duration:
+                self.difficulty_flash_active = False
+        else:
+            color = (255, 255, 255)
+
+        text = f"Difficulty: {self.settings.difficulty.capitalize()}"
+        text_surf = self.font.render(text, True, color)
+        text_rect = text_surf.get_rect()
+        text_rect.topleft = (20, 20)
+        self.screen.blit(text_surf, text_rect)
+
+    # ------------------------
+    # Win celebration
+    # ------------------------
+    def draw_win_flash(self):
+        if self.win_flash_active:
+            flash_surface = pygame.Surface(
+                (self.settings.screen_width, self.settings.screen_height), pygame.SRCALPHA
+            )
+            alpha = 150 * (1 - self.win_flash_timer / self.win_flash_duration)
+            flash_surface.fill((255, 255, 255, int(alpha)))
+            self.screen.blit(flash_surface, (0, 0))
+            self.win_flash_timer += 1
+            if self.win_flash_timer >= self.win_flash_duration:
+                self.win_flash_active = False
 
     # ------------------------
     # Game loop
@@ -173,9 +225,6 @@ class AlienInvasion:
                 self.alien_fleet.update_fleet()
                 self._check_collisions()
                 self._update_screen()
-                # Victory check
-                if self.alien_fleet.check_destroyed_status():
-                    self.victory = True
             self.clock.tick(self.settings.FPS)
 
     # ------------------------
@@ -190,9 +239,14 @@ class AlienInvasion:
         )
         if collisions:
             pygame.mixer.Sound(self.settings.impact_sound).play()
+
         if self.alien_fleet.check_fleet_bottom():
             self._ship_hit()
+
+        # If fleet destroyed → celebration
         if self.alien_fleet.check_destroyed_status():
+            self.win_flash_active = True
+            self.win_flash_timer = 0
             self._reset_level()
 
     # ------------------------
@@ -207,7 +261,7 @@ class AlienInvasion:
             self.running = False
 
     # ------------------------
-    # Reset level
+    # Reset
     # ------------------------
     def _reset_level(self):
         self.ship.arsenal.arsenal.empty()
@@ -216,19 +270,19 @@ class AlienInvasion:
         self.play_alien_drums()
 
     # ------------------------
-    # Update screen
+    # Screen refresh
     # ------------------------
     def _update_screen(self):
         self.draw_ghana_background()
         self.ship.draw()
         self.alien_fleet.draw()
         self.draw_lives()
-        if self.victory:
-            self.draw_victory()
+        self.draw_difficulty()
+        self.draw_win_flash()
         pygame.display.flip()
 
     # ------------------------
-    # Input handling
+    # Input
     # ------------------------
     def _check_events(self):
         for event in pygame.event.get():
@@ -250,6 +304,21 @@ class AlienInvasion:
         elif event.key == pygame.K_q:
             pygame.quit()
             sys.exit()
+        elif event.key == pygame.K_1:
+            self.settings.difficulty = 'easy'
+            self._reset_level()
+            self.difficulty_flash_active = True
+            self.difficulty_flash_timer = 0
+        elif event.key == pygame.K_2:
+            self.settings.difficulty = 'medium'
+            self._reset_level()
+            self.difficulty_flash_active = True
+            self.difficulty_flash_timer = 0
+        elif event.key == pygame.K_3:
+            self.settings.difficulty = 'hard'
+            self._reset_level()
+            self.difficulty_flash_active = True
+            self.difficulty_flash_timer = 0
 
     def _keyup(self, event):
         if event.key == pygame.K_RIGHT:
