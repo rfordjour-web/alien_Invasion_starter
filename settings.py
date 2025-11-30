@@ -40,7 +40,7 @@ class Settings:
         self.bullet_speed = 7
         self.bullet_width = 5
         self.bullet_height = 20
-        self.bullet_amount = 5
+        self.bullets_allowed = 5
 
         # ------------------------
         # Alien settings
@@ -48,9 +48,9 @@ class Settings:
         self.alien_file = Path.cwd() / 'Assets' / 'images' / 'enemy_4.png'
         self.alien_width = 40
         self.alien_height = 40
-        self.fleet_speed = 2
+        self.fleet_speed = 1
         self.fleet_direction = 1  # 1 represents right; -1 represents left
-        self.fleet_drop_speed = 40
+        self.fleet_drop_speed = 4
 
         # ------------------------
         # Alien drum intro
