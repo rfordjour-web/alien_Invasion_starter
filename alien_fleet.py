@@ -16,23 +16,64 @@ class AlienFleet:
         self.game = game
         self.settings = game.settings
         self.fleet = pygame.sprite.Group()
-        self.fleet_direction = self.settings.fleet_direction
+        self.fleet_direction = 1
         self.fleet_drop_speed = self.settings.fleet_drop_speed
 
         self.create_fleet()
 
+    # ------------------------
+    # Create fleet
+    # ------------------------
     def create_fleet(self):
-        """Create a smaller fleet of aliens."""
-        for row in range(self.settings.alien_rows):
-            for col in range(self.settings.aliens_per_row):
-                x = 100 + col * (self.settings.alien_width + 20)
-                y = 50 + row * (self.settings.alien_height + 20)
-                self._create_alien(x, y)
+        alien_width = self.settings.alien_width
+        alien_height = self.settings.alien_height
+        screen_width = self.settings.screen_width
+        screen_height = self.settings.screen_height
 
+        fleet_width, fleet_height = self.calculate_fleet_size(alien_width, screen_width, alien_height, screen_height)
+        x_offset, y_offset = self.calculate_offset(alien_width, alien_height, screen_width, fleet_width, fleet_height)
+
+        self._create_rectangle_fleet(alien_width, alien_height, fleet_width, fleet_height, x_offset, y_offset)
+
+    def _create_rectangle_fleet(self, alien_width, alien_height, fleet_width, fleet_height, x_offset, y_offset):
+        for row in range(fleet_height):
+            for column in range(fleet_width):
+                current_x = (alien_width + 20) * column + x_offset
+                current_y = (alien_height + 20) * row + y_offset
+                self._create_alien(current_x, current_y)
+
+    # ------------------------
+    # Calculate fleet size
+    # ------------------------
+    def calculate_fleet_size(self, alien_width, screen_width, alien_height, screen_height):
+        fleet_width = (screen_width // (alien_width * 2)) - 2
+        fleet_height = (screen_height // 2) // (alien_height * 2)
+
+        fleet_width = max(3, fleet_width)   # minimum 3 aliens per row
+        fleet_height = max(2, fleet_height) # minimum 2 rows
+
+        return int(fleet_width), int(fleet_height)
+
+    # ------------------------
+    # Calculate offsets
+    # ------------------------
+    def calculate_offset(self, alien_width, alien_height, screen_width, fleet_width, fleet_height):
+        fleet_horizontal_space = fleet_width * (alien_width + 20)
+        fleet_vertical_space = fleet_height * (alien_height + 20)
+        x_offset = int((screen_width - fleet_horizontal_space) // 2)
+        y_offset = 50  # start a bit from top
+        return x_offset, y_offset
+
+    # ------------------------
+    # Create single alien
+    # ------------------------
     def _create_alien(self, x, y):
-        alien = Alien(self, x, y)
-        self.fleet.add(alien)
+        new_alien = Alien(self, x, y)
+        self.fleet.add(new_alien)
 
+    # ------------------------
+    # Edge check & drop
+    # ------------------------
     def _check_fleet_edges(self):
         for alien in self.fleet:
             if alien.check_edges():
@@ -43,16 +84,22 @@ class AlienFleet:
     def update_fleet(self):
         self._check_fleet_edges()
         for alien in self.fleet:
-            alien.rect.x += self.fleet_direction * self.settings.fleet_speed
+            alien.rect.x += self.settings.fleet_speed * self.fleet_direction
 
     def _drop_alien_fleet(self):
         for alien in self.fleet:
             alien.rect.y += self.fleet_drop_speed
 
+    # ------------------------
+    # Draw aliens
+    # ------------------------
     def draw(self):
         for alien in self.fleet:
             alien.draw_alien()
 
+    # ------------------------
+    # Collision & bottom check
+    # ------------------------
     def check_collisions(self, other_group):
         return pygame.sprite.groupcollide(other_group, self.fleet, True, True)
 

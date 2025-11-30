@@ -11,7 +11,6 @@ from time import sleep
 from settings import Settings
 from game_stats import GameStats
 from ship import Ship
-from arsenal import ShipArsenal
 from alien_fleet import AlienFleet
 
 # ------------------------
@@ -75,7 +74,7 @@ class AlienInvasion:
         self.beat_max = 40
         self.beat_timer = self.beat_max
 
-        # Win celebration flag
+        # Win celebration
         self.win_flash_timer = 0
         self.win_flash_duration = 60
         self.win_flash_active = False
@@ -140,20 +139,10 @@ class AlienInvasion:
         )
 
         # Soft glow
-        draw_star(
-            self.screen,
-            (60, 60, 60),
-            (cx, cy),
-            radius + 6
-        )
+        draw_star(self.screen, (60, 60, 60), (cx, cy), radius + 6)
 
         # Main star
-        draw_star(
-            self.screen,
-            BLACK,
-            (cx, cy),
-            radius
-        )
+        draw_star(self.screen, BLACK, (cx, cy), radius)
 
     # ------------------------
     # Drum intro
@@ -220,7 +209,6 @@ class AlienInvasion:
         if self.alien_fleet.check_fleet_bottom():
             self._ship_hit()
 
-        # If fleet destroyed → celebration
         if self.alien_fleet.check_destroyed_status():
             self.win_flash_active = True
             self.win_flash_timer = 0
