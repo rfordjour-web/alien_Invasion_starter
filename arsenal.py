@@ -1,38 +1,31 @@
 
 
 
-
 import pygame
-from typing import TYPE_CHECKING
 from bullet import Bullet
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from alien_invasion import AlienInvasion
 
-
 class ShipArsenal:
-    """A class to manage the ship's arsenal."""
+    """Manage the ship's bullets."""
 
     def __init__(self, game: 'AlienInvasion'):
-        """Initialize the ship's arsenal."""
-        self.game = game  
+        self.game = game
         self.settings = game.settings
         self.screen = game.screen
         self.arsenal = pygame.sprite.Group()
 
     def update_arsenal(self):
-        """Update the ship's arsenal."""
+        """Update bullets and remove off-screen ones."""
         self.arsenal.update()
-        self._remove_bullets_offscreen()
-
-    def _remove_bullets_offscreen(self):
-        """Remove bullets that have moved off the screen."""
         for bullet in self.arsenal.copy():
             if bullet.rect.bottom <= 0:
                 self.arsenal.remove(bullet)
 
     def draw(self):
-        """Draw the ship's arsenal on the screen."""
+        """Draw all bullets on the screen."""
         for bullet in self.arsenal:
             bullet.draw()
 
@@ -41,5 +34,10 @@ class ShipArsenal:
         if len(self.arsenal) < self.settings.bullets_allowed:
             new_bullet = Bullet(self.game)
             self.arsenal.add(new_bullet)
+            # Play laser sound
+            try:
+                pygame.mixer.Sound(self.settings.laser_sound).play()
+            except Exception as e:
+                print(f"Laser sound failed: {e}")
             return True
         return False
