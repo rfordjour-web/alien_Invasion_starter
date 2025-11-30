@@ -12,6 +12,8 @@ if TYPE_CHECKING:
     from alien_invasion import AlienInvasion
 
 class AlienFleet:
+    """Manage the fleet of aliens."""
+
     def __init__(self, game: 'AlienInvasion'):
         self.game = game
         self.settings = game.settings
@@ -43,7 +45,7 @@ class AlienFleet:
                 self._create_alien(current_x, current_y)
 
     # ------------------------
-    # Calculate fleet size
+    # Fleet size
     # ------------------------
     def calculate_fleet_size(self, alien_width, screen_width, alien_height, screen_height):
         fleet_width = (screen_width // (alien_width * 2)) - 2
@@ -55,13 +57,13 @@ class AlienFleet:
         return int(fleet_width), int(fleet_height)
 
     # ------------------------
-    # Calculate offsets
+    # Offsets
     # ------------------------
     def calculate_offset(self, alien_width, alien_height, screen_width, fleet_width, fleet_height):
         fleet_horizontal_space = fleet_width * (alien_width + 20)
         fleet_vertical_space = fleet_height * (alien_height + 20)
         x_offset = int((screen_width - fleet_horizontal_space) // 2)
-        y_offset = 50  # start a bit from top
+        y_offset = 50
         return x_offset, y_offset
 
     # ------------------------
@@ -77,16 +79,19 @@ class AlienFleet:
     def _check_fleet_edges(self):
         for alien in self.fleet:
             if alien.check_edges():
-                self._drop_alien_fleet()
                 self.fleet_direction *= -1
+                self._drop_alien_fleet()
                 break
 
     def update_fleet(self):
+        """Move fleet horizontally and gradually downward."""
         self._check_fleet_edges()
         for alien in self.fleet:
             alien.rect.x += self.settings.fleet_speed * self.fleet_direction
+            alien.rect.y += self.fleet_drop_speed * 0.05  # smooth downward movement
 
     def _drop_alien_fleet(self):
+        """Drop fleet slightly when hitting an edge."""
         for alien in self.fleet:
             alien.rect.y += self.fleet_drop_speed
 
@@ -98,7 +103,7 @@ class AlienFleet:
             alien.draw_alien()
 
     # ------------------------
-    # Collision & bottom check
+    # Collisions & bottom check
     # ------------------------
     def check_collisions(self, other_group):
         return pygame.sprite.groupcollide(other_group, self.fleet, True, True)
