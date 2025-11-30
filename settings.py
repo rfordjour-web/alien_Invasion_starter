@@ -25,9 +25,9 @@ class Settings:
         # Ship settings
         # ------------------------
         self.ship_file = str(Path.cwd() / 'Assets' / 'images'/ 'ship2(no bg).png')
-        self.ship_width = 40
-        self.ship_height = 60
-        self.ship_speed = 5
+        self.ship_width = 30
+        self.ship_height = 44
+        self.ship_speed = 1
         self.starting_ship_count = 5  # start with 5 lives
 
         # ------------------------
@@ -48,9 +48,9 @@ class Settings:
         self.alien_file = Path.cwd() / 'Assets' / 'images' / 'enemy_4.png'
         self.alien_width = 40
         self.alien_height = 40
-        self.fleet_speed = 1
+        self.fleet_speed = 0.35
         self.fleet_direction = 1  # 1 represents right; -1 represents left
-        self.fleet_drop_speed = 4
+        self.fleet_drop_speed = 2
 
         # ------------------------
         # Alien drum intro
