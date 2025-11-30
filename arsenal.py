@@ -34,7 +34,7 @@ class ShipArsenal:
     def draw(self):
         """Draw the ship's arsenal on the screen."""
         for bullet in self.arsenal:
-            bullet.draw(self.screen)
+            bullet.draw()
 
     def fire_bullet(self):
         """Fire a bullet if under the allowed limit."""
