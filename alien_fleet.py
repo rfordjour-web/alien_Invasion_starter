@@ -22,7 +22,7 @@ class AlienFleet:
         self.create_fleet()
 
     def create_fleet(self):
-        """Create the fleet of aliens with fewer aliens per row and fewer rows."""
+        """Create a smaller fleet of aliens."""
         for row in range(self.settings.alien_rows):
             for col in range(self.settings.aliens_per_row):
                 x = 100 + col * (self.settings.alien_width + 20)

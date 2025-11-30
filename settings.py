@@ -48,31 +48,14 @@ class Settings:
         self.alien_width = 40
         self.alien_height = 40
         self.fleet_speed = 0.3
-        self.fleet_direction = 1
+        self.fleet_direction = 1  # 1 represents right; -1 represents left
         self.fleet_drop_speed = 2
-        self.aliens_per_row = 6  # fewer aliens
-        self.alien_rows = 3       # fewer rows
 
-        # ------------------------
-        # Difficulty
-        # ------------------------
-        # Options: "easy", "medium", "hard"
-        self.difficulty = "easy"
-        self.adjust_for_difficulty()
+        # Fewer aliens for easier gameplay
+        self.aliens_per_row = 6
+        self.alien_rows = 3
 
         # ------------------------
         # Alien drum intro
         # ------------------------
         self.alien_drums = Path.cwd() / 'Assets' / 'sound' / 'alien_drums.wav'
-
-    def adjust_for_difficulty(self):
-        """Adjust game parameters based on difficulty."""
-        if self.difficulty == "easy":
-            self.fleet_speed = 0.2
-            self.bullets_allowed = 15
-        elif self.difficulty == "medium":
-            self.fleet_speed = 0.35
-            self.bullets_allowed = 10
-        elif self.difficulty == "hard":
-            self.fleet_speed = 0.5
-            self.bullets_allowed = 7

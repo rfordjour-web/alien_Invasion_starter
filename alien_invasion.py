@@ -75,11 +75,6 @@ class AlienInvasion:
         self.beat_max = 40
         self.beat_timer = self.beat_max
 
-        # Difficulty flash effect
-        self.difficulty_flash_timer = 0
-        self.difficulty_flash_duration = 30
-        self.difficulty_flash_active = False
-
         # Win celebration flag
         self.win_flash_timer = 0
         self.win_flash_duration = 60
@@ -182,24 +177,6 @@ class AlienInvasion:
         self.screen.blit(text_surf, text_rect)
 
     # ------------------------
-    # Difficulty UI
-    # ------------------------
-    def draw_difficulty(self):
-        if self.difficulty_flash_active:
-            color = (255, 255, 0)
-            self.difficulty_flash_timer += 1
-            if self.difficulty_flash_timer >= self.difficulty_flash_duration:
-                self.difficulty_flash_active = False
-        else:
-            color = (255, 255, 255)
-
-        text = f"Difficulty: {self.settings.difficulty.capitalize()}"
-        text_surf = self.font.render(text, True, color)
-        text_rect = text_surf.get_rect()
-        text_rect.topleft = (20, 20)
-        self.screen.blit(text_surf, text_rect)
-
-    # ------------------------
     # Win celebration
     # ------------------------
     def draw_win_flash(self):
@@ -277,7 +254,6 @@ class AlienInvasion:
         self.ship.draw()
         self.alien_fleet.draw()
         self.draw_lives()
-        self.draw_difficulty()
         self.draw_win_flash()
         pygame.display.flip()
 
@@ -304,21 +280,6 @@ class AlienInvasion:
         elif event.key == pygame.K_q:
             pygame.quit()
             sys.exit()
-        elif event.key == pygame.K_1:
-            self.settings.difficulty = 'easy'
-            self._reset_level()
-            self.difficulty_flash_active = True
-            self.difficulty_flash_timer = 0
-        elif event.key == pygame.K_2:
-            self.settings.difficulty = 'medium'
-            self._reset_level()
-            self.difficulty_flash_active = True
-            self.difficulty_flash_timer = 0
-        elif event.key == pygame.K_3:
-            self.settings.difficulty = 'hard'
-            self._reset_level()
-            self.difficulty_flash_active = True
-            self.difficulty_flash_timer = 0
 
     def _keyup(self, event):
         if event.key == pygame.K_RIGHT:
