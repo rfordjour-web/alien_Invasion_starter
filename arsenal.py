@@ -38,7 +38,7 @@ class ShipArsenal:
 
     def fire_bullet(self):
         """Fire a bullet if under the allowed limit."""
-        if len(self.arsenal) < self.settings.bullets_amount:
+        if len(self.arsenal) < self.settings.bullets_allowed:
             new_bullet = Bullet(self.game)
             self.arsenal.add(new_bullet)
             return True
