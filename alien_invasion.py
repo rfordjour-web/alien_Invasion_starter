@@ -229,8 +229,8 @@ class AlienInvasion:
         if self.alien_fleet.check_destroyed_status():
             self.win_flash_active = True
             self.win_flash_timer = 0
-            self.settings.fleet_speed += 0.5
-            
+            self.settings.fleet_speed += 0.25
+
             self._reset_level()
 
 
