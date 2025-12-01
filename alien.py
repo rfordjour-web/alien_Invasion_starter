@@ -3,72 +3,43 @@
 
 
 import pygame
-from alien import Alien
+from pygame.sprite import Sprite
+from typing import TYPE_CHECKING
 
-class AlienFleet:
-    """Manages the alien fleet."""
+if TYPE_CHECKING:
+    from alien_fleet import AlienFleet
 
-    def __init__(self, game):
-        self.game = game
-        self.settings = game.settings
-        self.fleet = pygame.sprite.Group()
-        self.fleet_direction = 1  # 1: right, -1: left
-        self.fleet_drop_speed = self.settings.fleet_drop_speed
+class Alien(Sprite):
+    """A class representing a single alien in the fleet."""
 
-        self.create_fleet()
+    def __init__(self, fleet: 'AlienFleet', x: float, y: float):
+        super().__init__()
+        self.fleet = fleet
+        self.screen = fleet.game.screen
+        self.settings = fleet.game.settings
 
-    def create_fleet(self):
-        alien_width = self.settings.alien_width
-        alien_height = self.settings.alien_height
-        screen_width = self.settings.screen_width
-        screen_height = self.settings.screen_height
+        # Load and scale image
+        self.image = pygame.image.load(self.settings.alien_file)
+        self.image = pygame.transform.scale(
+            self.image,
+            (self.settings.alien_width, self.settings.alien_height)
+        )
 
-        fleet_width = max(3, (screen_width // (alien_width + 20)) - 2)
-        fleet_height = max(2, (screen_height // 2) // (alien_height + 20))
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
 
-        x_offset = (screen_width - (fleet_width * (alien_width + 20))) // 2
-        y_offset = 50
+        self.x = float(self.rect.x)
+        self.y = float(self.rect.y)
 
-        for row in range(fleet_height):
-            for col in range(fleet_width):
-                x = (alien_width + 20) * col + x_offset
-                y = (alien_height + 20) * row + y_offset
-                self._create_alien(x, y)
+    # ------------------------
+    # Draw the alien
+    # ------------------------
+    def draw_alien(self):
+        self.screen.blit(self.image, self.rect)
 
-    def _create_alien(self, x, y):
-        alien = Alien(self, x, y)
-        self.fleet.add(alien)
-
-    def update_fleet(self):
-        """Move fleet horizontally and slowly down."""
-        self._check_fleet_edges()
-        for alien in self.fleet:
-            alien.rect.x += self.settings.fleet_speed * self.fleet_direction
-            alien.rect.y += self.fleet_drop_speed * 0.3
-
-    def _check_fleet_edges(self):
-        for alien in self.fleet:
-            if alien.check_edges():
-                self._drop_alien_fleet()
-                self.fleet_direction *= -1
-                break
-
-    def _drop_alien_fleet(self):
-        for alien in self.fleet:
-            alien.rect.y += self.fleet_drop_speed
-
-    def draw(self):
-        for alien in self.fleet:
-            alien.draw_alien()
-
-    def check_collisions(self, other_group):
-        return pygame.sprite.groupcollide(other_group, self.fleet, True, True)
-
-    def check_fleet_bottom(self):
-        for alien in self.fleet:
-            if alien.rect.bottom >= self.settings.screen_height:
-                return True
-        return False
-
-    def check_destroyed_status(self):
-        return not self.fleet
+    # ------------------------
+    # Check if alien is at screen edge
+    # ------------------------
+    def check_edges(self):
+        return self.rect.right >= self.screen.get_rect().right or self.rect.left <= 0

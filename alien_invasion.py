@@ -188,7 +188,7 @@ class AlienInvasion:
             self._check_events()
             if self.game_stats.ships_left > 0:
                 self.ship.update()
-                self.alien_fleet.update_fleet()
+                self.alien_fleet.update_fleet()  # Fleet handles all alien movement
                 self._check_collisions()
             self._update_screen()
             self.clock.tick(self.settings.FPS)

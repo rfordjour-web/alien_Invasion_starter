@@ -27,14 +27,14 @@ class ShipArsenal:
     def draw(self):
         """Draw all bullets on the screen."""
         for bullet in self.arsenal:
-            bullet.draw()
+            bullet.draw_bullet()  # Fixed method name
 
     def fire_bullet(self):
         """Fire a bullet if under the allowed limit."""
         if len(self.arsenal) < self.settings.bullets_allowed:
             new_bullet = Bullet(self.game)
             self.arsenal.add(new_bullet)
-            # Play laser sound
+            # Play laser sound safely
             try:
                 pygame.mixer.Sound(self.settings.laser_sound).play()
             except Exception as e:
