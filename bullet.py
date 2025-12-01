@@ -34,3 +34,14 @@ class Bullet(Sprite):
     def draw_bullet(self):
         """Draw bullet to the screen."""
         pygame.draw.rect(self.screen, self.settings.bullet_color, self.rect)
+
+
+        # ------------------------
+# Bullet settings
+# ------------------------
+        self.bullet_width = 7
+        self.bullet_height = 25
+        self.bullet_speed = 12
+        self.bullets_allowed = 10
+
+
