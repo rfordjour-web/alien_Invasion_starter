@@ -1,5 +1,15 @@
 
+""""
+Lab Name: Ship.py
+Author:Rosemond Fordjour
+Purpose:manages the player's ship, including its position, 
+movement, drawing on the screen, 
+and firing bullets.
+Date: November 30, 2025
 
+
+
+"""
 
 
 
