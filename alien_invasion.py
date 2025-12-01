@@ -1,5 +1,9 @@
-
-
+"""
+Lab Name: Alien Invasion.py
+Author: Rosemond Forjdour
+Purpose: is the main game controller that initializes everything, runs the game loop, handles input, updates objects, and draws the screen.
+Date: November 30, 2025
+"""
 
 
 

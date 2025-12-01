@@ -1,4 +1,12 @@
+""""
+Lab Name: Bullet.py
+Author: Rosemond Fordjour
+Purpose: manages the ship's bullets: creating them, 
+updating their positions, drawing them, 
+and enforcing the limit on how many can exist at once.
+Date: November 30, 2025
 
+"""
 
 
 

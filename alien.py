@@ -1,4 +1,10 @@
-
+"""
+Lab Name: Alien Fleet
+Author: Rosemond Fordjour
+Purpose: manages the creation, movement, edge-checking, 
+and drawing of all the aliens in the game.
+Date: November 30, 2025
+"""
 
 
 

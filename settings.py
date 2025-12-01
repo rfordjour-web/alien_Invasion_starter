@@ -1,4 +1,10 @@
-
+"""""
+Lab Nmae: Settings.py
+Author: Rosemond Fordjour
+Purpose: stores all configurable values for the game, like screen size, ship speed, bullet properties, alien speed, 
+and file paths for images and sounds.
+Date: November 30, 2025
+"""
 
 
 

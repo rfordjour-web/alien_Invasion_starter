@@ -1,4 +1,12 @@
+""""
+Lab Name: Arsenal.py
+Author: Rosemond Fordjour
+Purpose: defines a single alien, including its image, 
+position, movement, edge detection, and how it's drawn on the screen.
+Date: November 30, 2025
 
+
+"""
 
 
 import pygame
