@@ -23,7 +23,7 @@ class Settings:
 
         self.ship_width = 85
         self.ship_height = 65
-        self.ship_file = "images/ship.png"
+        self.ship_file = "Assets/images/ship2.png"
 
         # ----------------
         # Bullets
