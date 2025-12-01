@@ -2,62 +2,74 @@
 
 
 
-
-from pathlib import Path
-
 class Settings:
-    """A class to store all settings for Alien Invasion."""
+    """Store all settings for the game."""
 
     def __init__(self):
-        # ------------------------
-        # Game window title
-        # ------------------------
-        self.name = "Alien Invasion"
 
-        # ------------------------
-        # Screen settings
-        # ------------------------
+        # ----------------
+        # Display
+        # ----------------
+        self.name = "Aliens vs Ghana 🇬🇭"
+        self.FPS = 60
         self.screen_width = 1200
         self.screen_height = 800
-        self.FPS = 60
 
-        # ------------------------
-        # Ship settings
-        # ------------------------
-        self.ship_file = str(Path.cwd() / 'Assets' / 'images' / 'ship2(no bg).png')
-        self.ship_width = 30
-        self.ship_height = 44
-        self.ship_speed = 7
-        self.starting_ship_count = 5
+        # ----------------
+        # Ship
+        # ----------------
+        self.ship_speed = 4.5
+        self.starting_ship_count = 3
 
-        # ------------------------
-        # Bullet settings
-        # ------------------------
-        self.bullet_width = 7
-        self.bullet_height = 25
-        self.bullet_speed = 12
-        self.bullets_allowed = 10
-        self.bullet_color = (255, 255, 255)
-        self.laser_sound = Path.cwd() / 'Assets' / 'sound' / 'laser.mp3'
-        self.impact_sound = Path.cwd() / 'Assets' / 'sound' / 'impactSound.mp3'
+        self.ship_width = 85
+        self.ship_height = 65
+        self.ship_file = "images/ship.png"
 
-        # ------------------------
+        # ----------------
+        # Bullets
+        # ----------------
+        self.bullets_allowed = 5
+
+        # ----------------
+        # Sounds
+        # ----------------
+        self.alien_drums = "sounds/drums.wav"
+        self.laser_sound = "sounds/laser.wav"
+        self.impact_sound = "sounds/explosion.wav"
+
+        # ----------------
         # Alien settings
-        # ------------------------
-        self.alien_file = Path.cwd() / 'Assets' / 'images' / 'enemy_4.png'
-        self.alien_width = 40
-        self.alien_height = 40
+        # ----------------
+        self.alien_width = 55
+        self.alien_height = 48
 
-        # Movement speeds
-        self.fleet_speed = 2         # horizontal speed of aliens
-        self.fleet_drop_speed = 5    # vertical drop distance when hitting edges
-        self.fleet_direction = 1     # 1 = right, -1 = left
+        # ----------------
+        # DIFFICULTY LEVELS
+        # ----------------
+        self.difficulties = {
+            "EASY": {
+                "fleet_speed": 1.0,
+                "fleet_drop_speed": 0.25
+            },
+            "MEDIUM": {
+                "fleet_speed": 2.0,
+                "fleet_drop_speed": 0.65
+            },
+            "HARD": {
+                "fleet_speed": 4.0,
+                "fleet_drop_speed": 1.25
+            }
+        }
 
-        # Alien formation
-        self.aliens_per_row = 6
-        self.alien_rows = 3
+        # Default difficulty
+        self.current_difficulty = "EASY"
 
-        # ------------------------
-        # Alien drum intro
-        # ------------------------
-        self.alien_drums = Path.cwd() / 'Assets' / 'sound' / 'alien_drums.wav'
+        # Apply difficulty
+        self.apply_difficulty()
+
+    def apply_difficulty(self):
+        """Apply selected difficulty to alien movement."""
+        level = self.difficulties[self.current_difficulty]
+        self.fleet_speed = level["fleet_speed"]
+        self.fleet_drop_speed = level["fleet_drop_speed"]
+
