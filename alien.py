@@ -3,52 +3,107 @@
 
 
 import pygame
-from pygame.sprite import Sprite
-from typing import TYPE_CHECKING
+import sys
+from settings import Settings
+from alien_fleet import AlienFleet
+from ship import Ship  # assuming you have a Ship class
+from bullet import Bullet  # assuming you have a Bullet class
 
-if TYPE_CHECKING:
-    from alien_fleet import AlienFleet
-
-class Alien(Sprite):
-    def __init__(self, fleet: 'AlienFleet', x: float, y: float):
-        super().__init__()
-
-        self.fleet = fleet
-        self.screen = fleet.game.screen
-        self.boundaries = fleet.game.screen.get_rect()
-        self.settings = fleet.game.settings
-
-        self.image = pygame.image.load(self.settings.alien_file)
-        self.image = pygame.transform.scale(
-            self.image,
-            (self.settings.alien_width, self.settings.alien_height)
+class AlienInvasion:
+    def __init__(self):
+        pygame.init()
+        self.settings = Settings()
+        self.screen = pygame.display.set_mode(
+            (self.settings.screen_width, self.settings.screen_height)
         )
+        pygame.display.set_caption(self.settings.name)
 
-        self.rect = self.image.get_rect()
-        self.rect.x = x
-        self.rect.y = y 
-        
-        self.x = float(self.rect.x)
-        self.y = float(self.rect.y)
+        # Game elements
+        self.ship = Ship(self)
+        self.bullets = pygame.sprite.Group()
+        self.alien_fleet = AlienFleet(self)
 
-    # ------------------------
-    # Update alien position
-    # ------------------------
-    def update(self):
-        temp_speed = self.settings.fleet_speed
-        self.x += temp_speed * self.settings.fleet_direction
-        self.rect.x = self.x
-        self.rect.y = self.y
+        # Clock for FPS control
+        self.clock = pygame.time.Clock()
 
-    # ------------------------
-    # Check if alien is at edge
-    # ------------------------
-    def check_edges(self):
-        """Return True if alien is at edge of screen."""
-        return self.rect.right >= self.boundaries.right or self.rect.left <= self.boundaries.left
+    def run_game(self):
+        while True:
+            self._check_events()
+            self._update_game()
+            self._update_screen()
+            self.clock.tick(self.settings.FPS)
 
     # ------------------------
-    # Draw the alien
+    # Event handling
     # ------------------------
-    def draw_alien(self):
-        self.screen.blit(self.image, self.rect)
+    def _check_events(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            elif event.type == pygame.KEYDOWN:
+                self._check_keydown(event)
+            elif event.type == pygame.KEYUP:
+                self._check_keyup(event)
+
+    def _check_keydown(self, event):
+        if event.key == pygame.K_RIGHT:
+            self.ship.moving_right = True
+        elif event.key == pygame.K_LEFT:
+            self.ship.moving_left = True
+        elif event.key == pygame.K_SPACE:
+            self._fire_bullet()
+
+    def _check_keyup(self, event):
+        if event.key == pygame.K_RIGHT:
+            self.ship.moving_right = False
+        elif event.key == pygame.K_LEFT:
+            self.ship.moving_left = False
+
+    # ------------------------
+    # Bullet firing
+    # ------------------------
+    def _fire_bullet(self):
+        if len(self.bullets) < self.settings.bullets_allowed:
+            new_bullet = Bullet(self)
+            self.bullets.add(new_bullet)
+
+    # ------------------------
+    # Update all game elements
+    # ------------------------
+    def _update_game(self):
+        self.ship.update()
+        self._update_bullets()
+        self.alien_fleet.update_fleet()
+
+    def _update_bullets(self):
+        self.bullets.update()
+
+        # Remove bullets that have gone off screen
+        for bullet in self.bullets.copy():
+            if bullet.rect.bottom <= 0:
+                self.bullets.remove(bullet)
+
+        # Check for collisions with aliens
+        collisions = self.alien_fleet.check_collisions(self.bullets)
+        if collisions:
+            for aliens_hit in collisions.values():
+                for alien in aliens_hit:
+                    self.alien_fleet.fleet.remove(alien)
+
+    # ------------------------
+    # Draw everything
+    # ------------------------
+    def _update_screen(self):
+        self.screen.fill((30, 30, 30))  # background color
+
+        self.ship.blitme()
+        for bullet in self.bullets.sprites():
+            bullet.draw_bullet()
+        self.alien_fleet.draw()
+
+        pygame.display.flip()
+
+if __name__ == "__main__":
+    ai = AlienInvasion()
+    ai.run_game()

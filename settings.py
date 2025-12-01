@@ -24,7 +24,7 @@ class Settings:
         # ------------------------
         # Ship settings
         # ------------------------
-        self.ship_file = str(Path.cwd() / 'Assets' / 'images'/ 'ship2(no bg).png')
+        self.ship_file = str(Path.cwd() / 'Assets' / 'images' / 'ship2(no bg).png')
         self.ship_width = 30
         self.ship_height = 44
         self.ship_speed = 7
@@ -47,11 +47,13 @@ class Settings:
         self.alien_file = Path.cwd() / 'Assets' / 'images' / 'enemy_4.png'
         self.alien_width = 40
         self.alien_height = 40
-        self.fleet_speed = 0.3
-        self.fleet_direction = 1  # 1 represents right; -1 represents left
-        self.fleet_drop_speed = 2
 
-        # Fewer aliens for easier gameplay
+        # Movement speeds
+        self.fleet_speed = 2         # horizontal speed of aliens
+        self.fleet_drop_speed = 5    # vertical drop distance when hitting edges
+        self.fleet_direction = 1     # 1 = right, -1 = left
+
+        # Alien formation
         self.aliens_per_row = 6
         self.alien_rows = 3
 

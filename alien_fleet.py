@@ -18,6 +18,7 @@ class AlienFleet:
         self.fleet_direction = 1  # 1: right, -1: left
         self.fleet_drop_speed = self.settings.fleet_drop_speed
 
+        # Create fleet once at the start
         self.create_fleet()
 
     # ------------------------
@@ -66,23 +67,32 @@ class AlienFleet:
     # Edge check & drop
     # ------------------------
     def _check_fleet_edges(self):
+        """Check if any alien has reached the screen edge"""
         for alien in self.fleet:
             if alien.check_edges():
                 self._drop_alien_fleet()
                 self.fleet_direction *= -1
                 break
 
-    def update_fleet(self):
-        """Move fleet horizontally and slowly down"""
-        self._check_fleet_edges()
-        for alien in self.fleet:
-            alien.rect.x += self.settings.fleet_speed * self.fleet_direction
-            alien.rect.y += self.fleet_drop_speed * 0.02  # continuous slow drop
-
     def _drop_alien_fleet(self):
         """Drop fleet when hitting edges"""
         for alien in self.fleet:
-            alien.rect.y += self.fleet_drop_speed
+            alien.rect.y += self.fleet_drop_speed  # bigger drop when hitting edge
+
+    # ------------------------
+    # Update fleet position
+    # ------------------------
+    def update_fleet(self):
+        """Move fleet horizontally and drop smoothly"""
+        # Handle edge behavior first
+        self._check_fleet_edges()
+
+        # Move each alien
+        for alien in self.fleet:
+            # Horizontal movement
+            alien.rect.x += self.settings.fleet_speed * self.fleet_direction
+            # Smooth downward movement (continuous)
+            alien.rect.y += self.fleet_drop_speed * 0.3  # tweak factor for visible speed
 
     # ------------------------
     # Draw aliens
@@ -105,4 +115,3 @@ class AlienFleet:
 
     def check_destroyed_status(self):
         return not self.fleet
-

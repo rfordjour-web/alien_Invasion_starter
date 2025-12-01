@@ -23,8 +23,7 @@ def draw_star(surface, color, center, radius):
         r = radius if i % 2 == 0 else radius * 0.4
         x = center[0] + r * math.cos(angle)
         y = center[1] - r * math.sin(angle)
-        points.append((x
-                     , y))
+        points.append((x, y))
     pygame.draw.polygon(surface, color, points)
 
 # ------------------------
@@ -191,7 +190,7 @@ class AlienInvasion:
                 self.ship.update()
                 self.alien_fleet.update_fleet()
                 self._check_collisions()
-                self._update_screen()
+            self._update_screen()
             self.clock.tick(self.settings.FPS)
 
     # ------------------------
@@ -227,7 +226,7 @@ class AlienInvasion:
             self.running = False
 
     # ------------------------
-    # Reset
+    # Reset level
     # ------------------------
     def _reset_level(self):
         self.ship.arsenal.arsenal.empty()
@@ -247,7 +246,7 @@ class AlienInvasion:
         pygame.display.flip()
 
     # ------------------------
-    # Input
+    # Input handling
     # ------------------------
     def _check_events(self):
         for event in pygame.event.get():
