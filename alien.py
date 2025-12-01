@@ -3,107 +3,72 @@
 
 
 import pygame
-import sys
-from settings import Settings
-from alien_fleet import AlienFleet
-from ship import Ship  # assuming you have a Ship class
-from bullet import Bullet  # assuming you have a Bullet class
+from alien import Alien
 
-class AlienInvasion:
-    def __init__(self):
-        pygame.init()
-        self.settings = Settings()
-        self.screen = pygame.display.set_mode(
-            (self.settings.screen_width, self.settings.screen_height)
-        )
-        pygame.display.set_caption(self.settings.name)
+class AlienFleet:
+    """Manages the alien fleet."""
 
-        # Game elements
-        self.ship = Ship(self)
-        self.bullets = pygame.sprite.Group()
-        self.alien_fleet = AlienFleet(self)
+    def __init__(self, game):
+        self.game = game
+        self.settings = game.settings
+        self.fleet = pygame.sprite.Group()
+        self.fleet_direction = 1  # 1: right, -1: left
+        self.fleet_drop_speed = self.settings.fleet_drop_speed
 
-        # Clock for FPS control
-        self.clock = pygame.time.Clock()
+        self.create_fleet()
 
-    def run_game(self):
-        while True:
-            self._check_events()
-            self._update_game()
-            self._update_screen()
-            self.clock.tick(self.settings.FPS)
+    def create_fleet(self):
+        alien_width = self.settings.alien_width
+        alien_height = self.settings.alien_height
+        screen_width = self.settings.screen_width
+        screen_height = self.settings.screen_height
 
-    # ------------------------
-    # Event handling
-    # ------------------------
-    def _check_events(self):
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-            elif event.type == pygame.KEYDOWN:
-                self._check_keydown(event)
-            elif event.type == pygame.KEYUP:
-                self._check_keyup(event)
+        fleet_width = max(3, (screen_width // (alien_width + 20)) - 2)
+        fleet_height = max(2, (screen_height // 2) // (alien_height + 20))
 
-    def _check_keydown(self, event):
-        if event.key == pygame.K_RIGHT:
-            self.ship.moving_right = True
-        elif event.key == pygame.K_LEFT:
-            self.ship.moving_left = True
-        elif event.key == pygame.K_SPACE:
-            self._fire_bullet()
+        x_offset = (screen_width - (fleet_width * (alien_width + 20))) // 2
+        y_offset = 50
 
-    def _check_keyup(self, event):
-        if event.key == pygame.K_RIGHT:
-            self.ship.moving_right = False
-        elif event.key == pygame.K_LEFT:
-            self.ship.moving_left = False
+        for row in range(fleet_height):
+            for col in range(fleet_width):
+                x = (alien_width + 20) * col + x_offset
+                y = (alien_height + 20) * row + y_offset
+                self._create_alien(x, y)
 
-    # ------------------------
-    # Bullet firing
-    # ------------------------
-    def _fire_bullet(self):
-        if len(self.bullets) < self.settings.bullets_allowed:
-            new_bullet = Bullet(self)
-            self.bullets.add(new_bullet)
+    def _create_alien(self, x, y):
+        alien = Alien(self, x, y)
+        self.fleet.add(alien)
 
-    # ------------------------
-    # Update all game elements
-    # ------------------------
-    def _update_game(self):
-        self.ship.update()
-        self._update_bullets()
-        self.alien_fleet.update_fleet()
+    def update_fleet(self):
+        """Move fleet horizontally and slowly down."""
+        self._check_fleet_edges()
+        for alien in self.fleet:
+            alien.rect.x += self.settings.fleet_speed * self.fleet_direction
+            alien.rect.y += self.fleet_drop_speed * 0.3
 
-    def _update_bullets(self):
-        self.bullets.update()
+    def _check_fleet_edges(self):
+        for alien in self.fleet:
+            if alien.check_edges():
+                self._drop_alien_fleet()
+                self.fleet_direction *= -1
+                break
 
-        # Remove bullets that have gone off screen
-        for bullet in self.bullets.copy():
-            if bullet.rect.bottom <= 0:
-                self.bullets.remove(bullet)
+    def _drop_alien_fleet(self):
+        for alien in self.fleet:
+            alien.rect.y += self.fleet_drop_speed
 
-        # Check for collisions with aliens
-        collisions = self.alien_fleet.check_collisions(self.bullets)
-        if collisions:
-            for aliens_hit in collisions.values():
-                for alien in aliens_hit:
-                    self.alien_fleet.fleet.remove(alien)
+    def draw(self):
+        for alien in self.fleet:
+            alien.draw_alien()
 
-    # ------------------------
-    # Draw everything
-    # ------------------------
-    def _update_screen(self):
-        self.screen.fill((30, 30, 30))  # background color
+    def check_collisions(self, other_group):
+        return pygame.sprite.groupcollide(other_group, self.fleet, True, True)
 
-        self.ship.blitme()
-        for bullet in self.bullets.sprites():
-            bullet.draw_bullet()
-        self.alien_fleet.draw()
+    def check_fleet_bottom(self):
+        for alien in self.fleet:
+            if alien.rect.bottom >= self.settings.screen_height:
+                return True
+        return False
 
-        pygame.display.flip()
-
-if __name__ == "__main__":
-    ai = AlienInvasion()
-    ai.run_game()
+    def check_destroyed_status(self):
+        return not self.fleet
